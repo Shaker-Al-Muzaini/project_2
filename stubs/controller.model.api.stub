@@ -1,0 +1,50 @@
+<?php
+
+namespace {{ namespace }};
+use {{ namespacedModel }};
+use {{ rootNamespace }}Http\Controllers\Controller;
+use {{ rootNamespace }}Http\Resources\{{ model }}Resource;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+class {{ class }} extends Controller
+{
+
+ 
+    public function index(Request $request)
+    {
+        return {{ model }}Resource::collection({{ model }}::search($request)->sort($request)->paginate((request('per_page')??request('itemsPerPage'))??15));
+    }
+    public function store(Request $request)
+    {
+ 
+
+        $validator = Validator::make($request->all(),{{ model }}::createRules());
+        if($validator->fails()){
+            return response()->json(['errors'=>$validator->errors()],422);
+        }
+        ${{ modelVariable }} = {{ model }}::create($validator->validated());
+        return new {{ model }}Resource(${{ modelVariable }});
+    }
+    public function show(Request $request,{{ model }} ${{ modelVariable }})
+    {
+ 
+        return new {{ model }}Resource(${{modelVariable}});
+    }
+    public function update(Request $request, {{ model }} ${{ modelVariable }})
+    {
+ 
+        $validator = Validator::make($request->all(),{{ model }}::updateRules());
+        if($validator->fails()){
+            return response()->json(['errors'=>$validator->errors()],422);
+        }
+        ${{ modelVariable }}->update($validator->validated());
+        return new {{ model }}Resource(${{ modelVariable }});
+    }
+    public function destroy(Request $request,{{ model }} ${{ modelVariable }})
+    {
+        ${{ modelVariable }}->delete();
+        return new {{ model }}Resource(${{ modelVariable }});
+    }
+}
